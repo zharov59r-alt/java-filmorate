@@ -5,12 +5,12 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class Film {
+public class User {
 
     private Long id;
+    private String email;
+    private String login;
     private String name;
-    private String description;
-    private Instant releaseDate;
-    private Number duration;
+    private Instant birthday;
 
 }
