@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -25,6 +26,8 @@ public class FilmController {
     public Film create(@Valid @RequestBody Film film) {
         log.info("create {}", film);
 
+        log.warn("qwe {}", LocalDate.of(1895, 12, 28));
+
         Optional<List<String>> valid = FilmValidator.check(film);
 
         if (valid.isPresent()) {
@@ -32,18 +35,7 @@ public class FilmController {
             throw new ValidationException("Проверка входных параметров", valid.get());
         }
 
-        if (films.values()
-                .stream()
-                .map(u -> u.getEmail())
-                .anyMatch(email -> email.equals(film.getEmail()))) {
-            log.warn("dublicate email {}", film.getEmail());
-            throw new ValidationException("Этот имейл уже используется");
-        }
-
         film.setId(getNextId());
-        if (film.getName() == null || film.getName().isBlank()) {
-            film.setName(film.getLogin());
-        }
         films.put(film.getId(), film);
         return film;
     }
@@ -68,23 +60,10 @@ public class FilmController {
 
             Film oldFilm = films.get(newFilm.getId());
 
-            if (films.values()
-                    .stream()
-                    .filter(u -> !u.equals(oldFilm))
-                    .map(u -> u.getEmail())
-                    .anyMatch(email -> email.equals(newFilm.getEmail()))) {
-                log.warn("dublicate email {}", newFilm.getEmail());
-                throw new ValidationException("Этот имейл уже используется");
-            }
-
-            oldFilm.setEmail(newFilm.getEmail());
-            oldFilm.setLogin(newFilm.getLogin());
-            oldFilm.setName(
-                    (newFilm.getName() == null || newFilm.getName().isBlank()) ?
-                            newFilm.getLogin() :
-                            newFilm.getName()
-            );
-            oldFilm.setBirthday(newFilm.getBirthday());
+            oldFilm.setName(newFilm.getName());
+            oldFilm.setDescription(newFilm.getDescription());
+            oldFilm.setReleaseDate(newFilm.getReleaseDate());
+            oldFilm.setDuration(newFilm.getDuration());
 
             return oldFilm;
         }

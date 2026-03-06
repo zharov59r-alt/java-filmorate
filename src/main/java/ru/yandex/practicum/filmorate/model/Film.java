@@ -1,12 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
@@ -16,11 +12,11 @@ public class Film {
     @NotNull
     @NotBlank
     private String name;
-    @Max(200)
+    @Size(max = 200)
     private String description;
 
     private LocalDate releaseDate;
     @Positive
-    private Number duration;
+    private Double duration;
 
 }

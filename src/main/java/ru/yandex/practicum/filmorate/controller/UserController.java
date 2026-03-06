@@ -68,15 +68,6 @@ public class UserController {
 
             User oldUser = users.get(newUser.getId());
 
-            if (users.values()
-                    .stream()
-                    .filter(u -> !u.equals(oldUser))
-                    .map(u -> u.getEmail())
-                    .anyMatch(email -> email.equals(newUser.getEmail()))) {
-                log.warn("dublicate email {}", newUser.getEmail());
-                throw new ValidationException("Этот имейл уже используется");
-            }
-
             oldUser.setEmail(newUser.getEmail());
             oldUser.setLogin(newUser.getLogin());
             oldUser.setName(

@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,24 +9,24 @@ import java.util.Optional;
 
 public class FilmValidator {
 
-    public static Optional<List<String>> check(User user) {
+    public static Optional<List<String>> check(Film film) {
 
         List<String> errors = new ArrayList<>();
 
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            errors.add("Имейл должен быть указан");
-        } else if (!user.getEmail().contains("@")) {
-            errors.add("Имейл должен содержать символ @");
+        if (film.getName() == null || film.getName().isBlank()) {
+            errors.add("Название должено быть указано");
         }
 
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            errors.add("Логин должен быть указан");
-        } else if (user.getLogin().contains(" ")) {
-            errors.add("Логин не должен содержать пробелы");
+        if (film.getDescription() != null && film.getDescription().length() >= 200) {
+            errors.add("Максимальная длина описания — 200 символов");
         }
 
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            errors.add("Дата рождения не может быть в будущем");
+        if (film.getReleaseDate() != null && !film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 28))) {
+            errors.add("Дата релиза — не раньше 28 декабря 1895 года");
+        }
+
+        if (film.getDuration() != null && film.getDuration() <= 0) {
+            errors.add("Продолжительность фильма должна быть положительным числом");
         }
 
         if (errors.isEmpty())
