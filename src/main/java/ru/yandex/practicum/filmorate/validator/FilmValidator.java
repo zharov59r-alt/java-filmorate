@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserValidator {
+public class FilmValidator {
 
     public static Optional<List<String>> check(User user) {
 
