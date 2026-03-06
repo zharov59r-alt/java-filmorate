@@ -25,17 +25,14 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
         log.info("create {}", user);
 
-        Optional<List<String>> valid = UserValidator.check(user);
+        List<String> validation = UserValidator.check(user);
 
-        if (valid.isPresent()) {
-            log.warn("validation {}", valid.get());
-            throw new ValidationException("Проверка входных параметров", valid.get());
+        if (!validation.isEmpty()) {
+            log.warn("validation {}", validation);
+            throw new ValidationException("Проверка входных параметров", validation);
         }
 
-        if (users.values()
-                .stream()
-                .map(u -> u.getEmail())
-                .anyMatch(email -> email.equals(user.getEmail()))) {
+        if (UserValidator.checkEmailDublicate(users.values(), user)) {
             log.warn("dublicate email {}", user.getEmail());
             throw new ValidationException("Этот имейл уже используется");
         }
@@ -59,14 +56,19 @@ public class UserController {
 
         if (users.containsKey(newUser.getId())) {
 
-            Optional<List<String>> valid = UserValidator.check(newUser);
+            List<String> validation = UserValidator.check(newUser);
 
-            if (valid.isPresent()) {
-                log.warn("validation {}", valid.get());
-                throw new ValidationException("Проверка входных параметров", valid.get());
+            if (!validation.isEmpty()) {
+                log.warn("validation {}", validation);
+                throw new ValidationException("Проверка входных параметров", validation);
             }
 
             User oldUser = users.get(newUser.getId());
+
+            if (UserValidator.checkEmailDublicate(users.values(), newUser)) {
+                log.warn("dublicate email {}", newUser.getEmail());
+                throw new ValidationException("Этот имейл уже используется");
+            }
 
             oldUser.setEmail(newUser.getEmail());
             oldUser.setLogin(newUser.getLogin());

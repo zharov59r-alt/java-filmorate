@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class FilmValidator {
 
-    public static Optional<List<String>> check(Film film) {
+    public static List<String> check(Film film) {
 
         List<String> errors = new ArrayList<>();
 
@@ -29,10 +29,7 @@ public class FilmValidator {
             errors.add("Продолжительность фильма должна быть положительным числом");
         }
 
-        if (errors.isEmpty())
-            return Optional.empty();
-        else
-            return Optional.of(errors);
+        return errors;
 
     }
 

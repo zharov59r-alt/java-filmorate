@@ -4,12 +4,13 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public class UserValidator {
 
-    public static Optional<List<String>> check(User user) {
+    public static List<String> check(User user) {
 
         List<String> errors = new ArrayList<>();
 
@@ -29,10 +30,17 @@ public class UserValidator {
             errors.add("Дата рождения не может быть в будущем");
         }
 
-        if (errors.isEmpty())
-            return Optional.empty();
-        else
-            return Optional.of(errors);
+        return errors;
+
+    }
+
+    public static Boolean checkEmailDublicate(Collection<User> users, User user) {
+
+        return users
+                .stream()
+                .filter(u -> !u.equals(user))
+                .map(u -> u.getEmail())
+                .anyMatch(email -> email.equals(user.getEmail()));
 
     }
 

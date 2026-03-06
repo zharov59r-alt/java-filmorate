@@ -26,13 +26,11 @@ public class FilmController {
     public Film create(@Valid @RequestBody Film film) {
         log.info("create {}", film);
 
-        log.warn("qwe {}", LocalDate.of(1895, 12, 28));
+        List<String> validation = FilmValidator.check(film);
 
-        Optional<List<String>> valid = FilmValidator.check(film);
-
-        if (valid.isPresent()) {
-            log.warn("validation {}", valid.get());
-            throw new ValidationException("Проверка входных параметров", valid.get());
+        if (!validation.isEmpty()) {
+            log.warn("validation {}", validation);
+            throw new ValidationException("Проверка входных параметров", validation);
         }
 
         film.setId(getNextId());
@@ -51,11 +49,11 @@ public class FilmController {
 
         if (films.containsKey(newFilm.getId())) {
 
-            Optional<List<String>> valid = FilmValidator.check(newFilm);
+            List<String> validation = FilmValidator.check(newFilm);
 
-            if (valid.isPresent()) {
-                log.warn("validation {}", valid.get());
-                throw new ValidationException("Проверка входных параметров", valid.get());
+            if (!validation.isEmpty()) {
+                log.warn("validation {}", validation);
+                throw new ValidationException("Проверка входных параметров", validation);
             }
 
             Film oldFilm = films.get(newFilm.getId());
