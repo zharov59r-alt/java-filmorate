@@ -13,14 +13,14 @@ public class FilmValidator {
         List<String> errors = new ArrayList<>();
 
         if (film.getName() == null || film.getName().isBlank()) {
-            errors.add("Название должено быть указано");
+            errors.add("Название должно быть указано");
         }
 
         if (film.getDescription() != null && film.getDescription().length() >= 200) {
             errors.add("Максимальная длина описания — 200 символов");
         }
 
-        if (film.getReleaseDate() != null && !film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 28))) {
+        if (film.getReleaseDate() != null && film.getReleaseDate().compareTo(LocalDate.of(1895, 12, 28)) < 0) {
             errors.add("Дата релиза — не раньше 28 декабря 1895 года");
         }
 
