@@ -1,81 +1,58 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Long, Film> films = new HashMap<>();
+
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> findAll() {
-        return films.values();
+        return filmService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Film findById(@PathVariable Long id) {
+        return filmService.findById(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable("id") Long id,
+                          @PathVariable("userId") Long userId) {
+        return filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@PathVariable("id") Long id,
+                             @PathVariable("userId") Long userId) {
+        return filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> findTop(@RequestParam(name = "count", defaultValue = "10") Integer count) {
+        return filmService.findTop(count);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.info("create {}", film);
-
-        List<String> validation = FilmValidator.check(film);
-
-        if (!validation.isEmpty()) {
-            log.warn("validation {}", validation);
-            throw new ValidationException("Проверка входных параметров", validation);
-        }
-
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        return film;
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        log.info("update {}", newFilm);
-
-        if (newFilm.getId() == null) {
-            log.warn("id is null");
-            throw new ValidationException("Id должен быть указан");
-        }
-
-        if (films.containsKey(newFilm.getId())) {
-
-            List<String> validation = FilmValidator.check(newFilm);
-
-            if (!validation.isEmpty()) {
-                log.warn("validation {}", validation);
-                throw new ValidationException("Проверка входных параметров", validation);
-            }
-
-            Film oldFilm = films.get(newFilm.getId());
-
-            oldFilm.setName(newFilm.getName());
-            oldFilm.setDescription(newFilm.getDescription());
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            oldFilm.setDuration(newFilm.getDuration());
-
-            return oldFilm;
-        }
-
-        log.warn("id not exists");
-        throw new ValidationException("id = " + newFilm.getId() + " не найден", HttpStatus.NOT_FOUND);
+        return filmService.update(newFilm);
     }
 
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
 
 }
