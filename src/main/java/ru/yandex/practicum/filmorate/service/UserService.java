@@ -3,14 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.List;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,7 +60,6 @@ public class UserService {
 
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
     public void removeFriend(Long id, Long friendId) {
         log.info("removeFriend id = {}, friendId = {}", id,  friendId);
 
@@ -90,7 +91,6 @@ public class UserService {
         }
     }
 
-    @GetMapping("/users/{id}/friends")
     public Collection<User> findFriendById(Long id) {
         log.info("findFriendById id = {}", id);
 
@@ -106,7 +106,6 @@ public class UserService {
                 .toList();
     }
 
-    @GetMapping("/users/{id}/friends/common/{otherId}")
     public Collection<User> findCommonFriends(Long id, Long otherId) {
         log.info("removeFriend id = {}, otherId = {}", id,  otherId);
 
