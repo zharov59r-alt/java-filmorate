@@ -1,10 +1,12 @@
-package ru.yandex.practicum.filmorate.api;
+package ru.yandex.practicum.filmorate.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class ErrorResponse {
     private String error;
     private List<String> details;
@@ -13,8 +15,4 @@ public class ErrorResponse {
         this.error = error;
     }
 
-    public ErrorResponse(String error, List<String> details) {
-        this.error = error;
-        this.details = details;
-    }
 }
