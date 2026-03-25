@@ -32,7 +32,7 @@ public class UserController {
     public User findById(@PathVariable Long id) {
         return userService.findById(id);
     }
-
+/*
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") Long id,
                             @PathVariable("friendId") Long friendId) {
@@ -55,7 +55,7 @@ public class UserController {
                                                  @PathVariable("otherId") Long otherId) {
         return userService.findCommonFriends(id, otherId);
     }
-
+*/
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         return userService.create(user);

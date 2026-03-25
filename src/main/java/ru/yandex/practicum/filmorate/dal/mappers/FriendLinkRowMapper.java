@@ -1,0 +1,23 @@
+package ru.yandex.practicum.filmorate.dal.mappers;
+
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.FriendLink;
+import ru.yandex.practicum.filmorate.model.User;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@Component
+public class FriendLinkRowMapper implements RowMapper<FriendLink> {
+
+    @Override
+    public FriendLink mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+        FriendLink friendLink = new FriendLink();
+        friendLink.setId(resultSet.getLong("friend_link_id"));
+        friendLink.setUserIdFrom(resultSet.getLong("user_id_from"));
+        friendLink.setUserIdTo(resultSet.getLong("user_id_to"));
+        friendLink.setApproved(resultSet.getBoolean("approved"));
+        return friendLink;
+    }
+}

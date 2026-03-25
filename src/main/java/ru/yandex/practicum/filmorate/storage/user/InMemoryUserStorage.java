@@ -40,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
                         newUser.getName()
                 );
         oldUser.setBirthday(newUser.getBirthday());
-        oldUser.setFriends(newUser.getFriends());
+     //   oldUser.setFriends(newUser.getFriends());
         return oldUser;
     }
 

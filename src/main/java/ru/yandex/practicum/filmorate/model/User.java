@@ -27,6 +27,4 @@ public class User {
     @Past
     private LocalDate birthday;
 
-    private Set<Long> friends = new HashSet<>();
-
 }

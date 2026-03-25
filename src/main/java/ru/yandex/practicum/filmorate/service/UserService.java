@@ -28,6 +28,7 @@ public class UserService {
         return userStorage.findById(id);
     }
 
+    /*
     public void addFriend(Long id, Long friendId) {
         log.info("addFriend id = {}, friendId = {}", id,  friendId);
 
@@ -127,6 +128,8 @@ public class UserService {
                 .map(userStorage::findById)
                 .toList();
     }
+
+     */
 
     public User create(User user) {
         log.info("create {}", user);
