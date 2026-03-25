@@ -18,12 +18,15 @@ import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -139,18 +142,39 @@ public class FilmService {
             throw new ValidationException("Проверка входных параметров", validation);
         }
 
+        Optional<RatingMPA> ratingMPA = Optional.empty();
+
+        if (film.getRatingMpaId() != null) {
+            ratingMPA = ratingMPARepository.findById(film.getRatingMpaId());
+            if (ratingMPA.isEmpty())
+                throw new NotFoundException("Фильм не найден с ID: " + film.getRatingMpaId());
+        }
+
+        List<Genre> genres = new ArrayList<>();
+        if (!request.getGenres().isEmpty()) {
+            genres = genreRepository.findAllByIds(
+                        request.getGenres().stream()
+                                .map(Genre::getId)
+                                .toList()
+                        );
+
+            if (genres.size() != request.getGenres().size()) {
+                List<Long> missing = new ArrayList<>(request.getGenres().stream().map(Genre::getId).toList());
+                missing.removeAll(genres.stream().map(Genre::getId).toList());
+
+                throw new NotFoundException("Жанр не найден с ID: " + missing);
+            }
+
+        }
+
         film = filmRepository.save(film);
 
         filmGenreRepository.batchSave(FilmGenreMapper.toFilmGenreList(film.getId(), request.getGenres()));
 
         return FilmMapper.toFilmResponse(
                 film,
-                ratingMPARepository.findById(film.getRatingMpaId()),
-                genreRepository.findAllByIds(
-                        request.getGenres().stream()
-                                .map(Genre::getId)
-                                .toList()
-                ));
+                ratingMPA,
+                genres);
 
     }
 
@@ -169,18 +193,39 @@ public class FilmService {
             throw new ValidationException("Проверка входных параметров", validation);
         }
 
+        Optional<RatingMPA> ratingMPA = Optional.empty();
+
+        if (film.getRatingMpaId() != null) {
+            ratingMPA = ratingMPARepository.findById(film.getRatingMpaId());
+            if (ratingMPA.isEmpty())
+                throw new NotFoundException("MPA не найден с ID: " + film.getRatingMpaId());
+        }
+
+        List<Genre> genres = new ArrayList<>();
+        if (!request.getGenres().isEmpty()) {
+            genres = genreRepository.findAllByIds(
+                    request.getGenres().stream()
+                            .map(Genre::getId)
+                            .toList()
+            );
+
+            if (genres.size() != request.getGenres().size()) {
+                List<Long> missing = new ArrayList<>(request.getGenres().stream().map(Genre::getId).toList());
+                missing.removeAll(genres.stream().map(Genre::getId).toList());
+
+                throw new NotFoundException("Жанр не найден с ID: " + missing);
+            }
+
+        }
+
         film = filmRepository.update(film);
 
         filmGenreRepository.merge(film.getId(), FilmGenreMapper.toFilmGenreList(film.getId(), request.getGenres()));
 
         return FilmMapper.toFilmResponse(
                 film,
-                ratingMPARepository.findById(film.getRatingMpaId()),
-                genreRepository.findAllByIds(
-                        request.getGenres().stream()
-                                .map(Genre::getId)
-                                .toList()
-                ));
+                ratingMPA,
+                genres);
 
     }
 
