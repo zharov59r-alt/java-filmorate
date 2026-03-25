@@ -6,8 +6,8 @@ import lombok.Data;
 public class FriendLink {
 
     private Long id;
-    private Long userIdFrom;
-    private Long userIdTo;
+    private Long userId;
+    private Long friendUserId;
     private Boolean approved;
 
 }

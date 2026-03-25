@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 public class Film {
@@ -24,10 +22,6 @@ public class Film {
     @Positive
     private Double duration;
 
-    private Set<Long> likes = new HashSet<>();
-
-    private Set<Long> genres = new HashSet<>();
-
-    private RatingMPA raingMPA;
+    private Long ratingMpaId;
 
 }

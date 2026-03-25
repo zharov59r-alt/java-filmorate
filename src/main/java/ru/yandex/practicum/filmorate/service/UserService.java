@@ -3,14 +3,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Set;
 import java.util.List;
 
 
@@ -18,14 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     public Collection<User> findAll() {
-        return userStorage.findAll();
+        return userRepository.findAll();
     }
 
     public User findById(Long id) {
-        return userStorage.findById(id);
+
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
     }
 
     /*
@@ -131,8 +136,10 @@ public class UserService {
 
      */
 
-    public User create(User user) {
-        log.info("create {}", user);
+    public User create(NewUserRequest request) {
+        log.info("create {}", request);
+
+        User user = UserMapper.toUser(request);
 
         List<String> validation = UserValidator.check(user);
 
@@ -141,42 +148,38 @@ public class UserService {
             throw new ValidationException("Проверка входных параметров", validation);
         }
 
-        if (UserValidator.checkEmailDublicate(userStorage.findAll(), user)) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             log.warn("dublicate email {}", user.getEmail());
             throw new ValidationException("Этот имейл уже используется");
         }
 
-        userStorage.create(user);
+        user = userRepository.save(user);
+
         return user;
     }
 
-    public User update(User newUser) {
-        log.info("update {}", newUser);
+    public User update(UpdateUserRequest request) {
+        log.info("update {}", request);
 
-        if (newUser.getId() == null) {
-            log.warn("id is null");
-            throw new ValidationException("Id должен быть указан");
+
+        User user = userRepository.findById(request.getId())
+                .map(u -> UserMapper.toUser(u, request))
+                .orElseThrow(() -> new NotFoundException("id = " + request.getId() + " не найден"));
+
+        List<String> validation = UserValidator.check(user);
+
+        if (!validation.isEmpty()) {
+            log.warn("validation {}", validation);
+            throw new ValidationException("Проверка входных параметров", validation);
         }
 
-        if (userStorage.findById(newUser.getId()) != null) {
-
-            List<String> validation = UserValidator.check(newUser);
-
-            if (!validation.isEmpty()) {
-                log.warn("validation {}", validation);
-                throw new ValidationException("Проверка входных параметров", validation);
-            }
-
-            if (UserValidator.checkEmailDublicate(userStorage.findAll(), newUser)) {
-                log.warn("dublicate email {}", newUser.getEmail());
-                throw new ValidationException("Этот имейл уже используется");
-            }
-
-            return userStorage.update(newUser);
+        if (userRepository.findAllByEmail(user.getEmail()).size() > 1) {
+            log.warn("dublicate email {}", user.getEmail());
+            throw new ValidationException("Этот имейл уже используется");
         }
 
-        log.warn("id not exists");
-        throw new NotFoundException("id = " + newUser.getId() + " не найден");
+        return userRepository.update(user);
+
     }
 
 

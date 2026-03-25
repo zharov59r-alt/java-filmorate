@@ -15,8 +15,8 @@ public class FriendLinkRowMapper implements RowMapper<FriendLink> {
     public FriendLink mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         FriendLink friendLink = new FriendLink();
         friendLink.setId(resultSet.getLong("friend_link_id"));
-        friendLink.setUserIdFrom(resultSet.getLong("user_id_from"));
-        friendLink.setUserIdTo(resultSet.getLong("user_id_to"));
+        friendLink.setUserId(resultSet.getLong("user_id"));
+        friendLink.setFriendUserId(resultSet.getLong("friend_user_id"));
         friendLink.setApproved(resultSet.getBoolean("approved"));
         return friendLink;
     }

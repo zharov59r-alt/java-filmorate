@@ -4,7 +4,6 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class UserValidator {
@@ -30,16 +29,6 @@ public class UserValidator {
         }
 
         return errors;
-
-    }
-
-    public static Boolean checkEmailDublicate(Collection<User> users, User user) {
-
-        return users
-                .stream()
-                .filter(u -> !u.equals(user))
-                .map(u -> u.getEmail())
-                .anyMatch(email -> email.equals(user.getEmail()));
 
     }
 

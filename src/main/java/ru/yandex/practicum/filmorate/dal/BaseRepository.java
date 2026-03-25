@@ -29,8 +29,16 @@ public class BaseRepository<T> {
         }
     }
 
-    public void save(String query, Object... params) {
-        jdbc.update(query, params);
+    public int save(String query, Object... params) {
+        return jdbc.update(query, params);
+    }
+
+    public int[] batchSave(String query, List<Object[]> params) {
+        return jdbc.batchUpdate(query, params);
+    }
+
+    public int delete(String query, Long id) {
+        return jdbc.update(query, id);
     }
 
     protected long getNextId(String sequenceName) {

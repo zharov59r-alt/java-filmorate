@@ -49,8 +49,8 @@ user_id              INT8                 not null
 
 create table if not exists friend_link (
 friend_link_id       INT8                 primary key,
-user_id_from         INT8                 not null,
-user_id_to           INT8                 not null,
+user_id         INT8                 not null,
+friend_user_id           INT8                 not null,
 approved             BOOL                 not null
 );
 
@@ -76,11 +76,11 @@ alter table film_like
         references users (user_id);
 
 alter table friend_link
-    add constraint FK_friend_link_user_id_from foreign key (user_id_from)
+    add constraint FK_friend_link_user_id foreign key (user_id)
         references users (user_id);
 
 alter table friend_link
-    add constraint FK_friend_link_user_id_to foreign key (user_id_to)
+    add constraint FK_friend_link_friend_user_id foreign key (friend_user_id)
         references users (user_id);
 
 MERGE INTO rating_mpa (rating_mpa_id, rating_mpa_name)
@@ -97,19 +97,27 @@ VALUES
 MERGE INTO genre (genre_id, genre_name)
 KEY (genre_id)
 VALUES
-    (1, 'Драма'),
-    (2, 'Комедия'),
-    (3, 'Боевик'),
+    (1, 'Комедия'),
+    (2, 'Драма'),
+    (3, 'Мультфильм'),
     (4, 'Триллер'),
-    (5, 'Ужасы'),
-    (6, 'Фантастика'),
-    (7, 'Фэнтези'),
-    (8, 'Мелодрама'),
-    (9, 'Детектив'),
-    (10, 'Приключения');
+    (5, 'Документальный'),
+    (6, 'Боевик');
 
+/*
+insert into film (film_id, rating_mpa_id, film_name, film_description, film_release_date, film_duration)
+values (1, 1, 'q', 'w', '2020-02-03', 10);
 
+insert into film (film_id, rating_mpa_id, film_name, film_description, film_release_date, film_duration)
+values (2, null, 'q', 'w', '2020-02-03', 10);
 
+insert into film_genre (film_genre_id, film_id, genre_id)
+values (1, 1, 1);
+
+insert into film_genre (film_genre_id, film_id, genre_id)
+values (2, 1, 2);
+
+ */
 
 
 
