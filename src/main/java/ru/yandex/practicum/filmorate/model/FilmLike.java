@@ -5,15 +5,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class FilmGenre {
+public class FilmLike {
 
     private Long id;
     private Long filmId;
-    private Long genreId;
-
-    public FilmGenre(Long filmId, Long genreId) {
-        this.filmId = filmId;
-        this.genreId = genreId;
-    }
+    private Long userId;
 
 }

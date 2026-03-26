@@ -103,30 +103,3 @@ VALUES
     (4, 'Триллер'),
     (5, 'Документальный'),
     (6, 'Боевик');
-
-/*
-insert into film (film_id, rating_mpa_id, film_name, film_description, film_release_date, film_duration)
-values (1, 1, 'q', 'w', '2020-02-03', 10);
-
-insert into film (film_id, rating_mpa_id, film_name, film_description, film_release_date, film_duration)
-values (2, null, 'q', 'w', '2020-02-03', 10);
-
-insert into film_genre (film_genre_id, film_id, genre_id)
-values (1, 1, 1);
-
-insert into film_genre (film_genre_id, film_id, genre_id)
-values (2, 1, 2);
-
- */
-
-
-
-
-
-
-
-
-
-
-
-

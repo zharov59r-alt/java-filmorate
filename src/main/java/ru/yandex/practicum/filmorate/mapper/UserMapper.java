@@ -6,8 +6,6 @@ import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.Instant;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserMapper {
 

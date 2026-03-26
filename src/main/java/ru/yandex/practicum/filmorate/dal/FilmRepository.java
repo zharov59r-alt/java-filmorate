@@ -15,6 +15,15 @@ public class FilmRepository extends BaseRepository<Film> {
 
     private static final String GENERATOR_NAME = "public.s_film_id";
     private static final String FIND_ALL_QUERY = "SELECT * FROM film";
+    private static final String FIND_TOP =  "SELECT f.* " +
+                                            "FROM   (" +
+                                                "SELECT fl.film_id, count(1) cnt " +
+                                                "FROM film_like fl " +
+                                                "group by fl.film_id " +
+                                                "order by count(1) " +
+                                                "limit ?) tb " +
+                                            "JOIN   film f on f.film_id = tb.film_id " +
+                                            "ORDER BY tb.cnt desc";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM film WHERE film_id = ?";
     private static final String INSERT_QUERY = "INSERT INTO film (film_id, film_name, film_description, film_release_date, film_duration, rating_mpa_id)" +
             "VALUES (?, ?, ?, ?, ?, ?)";
@@ -26,6 +35,10 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public List<Film> findAll() {
         return findAll(FIND_ALL_QUERY);
+    }
+
+    public List<Film> findTop(Integer count) {
+        return findAll(FIND_TOP, count);
     }
 
     public Optional<Film> findById(Long id) {

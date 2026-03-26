@@ -14,14 +14,14 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Service
 public class RatingMPAService {
-    private final RatingMPARepository genreRepository;
+    private final RatingMPARepository ratingMPARepository;
 
     public Collection<RatingMPA> findAll() {
-        return genreRepository.findAll();
+        return ratingMPARepository.findAll();
     }
 
     public RatingMPA findById(Long id) {
-        return genreRepository.findById(id)
+        return ratingMPARepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Рейтинг МПА не найден с ID: " + id));
     }
 
