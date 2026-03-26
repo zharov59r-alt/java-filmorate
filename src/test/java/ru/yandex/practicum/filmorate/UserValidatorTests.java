@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.time.LocalDate.now;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
