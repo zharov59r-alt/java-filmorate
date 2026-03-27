@@ -3,133 +3,100 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.FriendLinkRepository;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FriendLinkMapper;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.FriendLink;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
+    private final FriendLinkRepository friendLinkRepository;
 
     public Collection<User> findAll() {
-        return userStorage.findAll();
+        return userRepository.findAll();
     }
 
     public User findById(Long id) {
-        return userStorage.findById(id);
+
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
     }
+
 
     public void addFriend(Long id, Long friendId) {
         log.info("addFriend id = {}, friendId = {}", id,  friendId);
 
-        User user = userStorage.findById(id);
-        User userFriend = userStorage.findById(friendId);
+        userRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
 
-        if (user == null) {
-            log.warn("id not exists");
-            throw new NotFoundException("id = " + id + " не найден");
-        }
+        userRepository.findById(friendId)
+            .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + friendId));
 
-        if (userFriend == null) {
-            log.warn("friendId not exists");
-            throw new NotFoundException("friendId = " + friendId + " не найден");
-        }
-
-        if (!user.getFriends().contains(friendId)) {
-
-            Set<Long> friendIds = user.getFriends();
-            friendIds.add(friendId);
-            user.setFriends(friendIds);
-            userStorage.update(user);
-
-            friendIds = userFriend.getFriends();
-            friendIds.add(id);
-            userFriend.setFriends(friendIds);
-            userStorage.update(userFriend);
-
+        if (friendLinkRepository.findByUserIdFriendUserId(id, friendId).isEmpty()) {
+            friendLinkRepository.save(FriendLinkMapper.toFriendLink(id, friendId));
         }
 
     }
+
 
     public void removeFriend(Long id, Long friendId) {
         log.info("removeFriend id = {}, friendId = {}", id,  friendId);
 
-        User user = userStorage.findById(id);
-        User userFriend = userStorage.findById(friendId);
+        userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
 
-        if (user == null) {
-            log.warn("id not exists");
-            throw new NotFoundException("id = " + id + " не найден");
-        }
+        userRepository.findById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + friendId));
 
-        if (userFriend == null) {
-            log.warn("friendId not exists");
-            throw new NotFoundException("friendId = " + friendId + " не найден");
-        }
+        Optional<FriendLink> friendLink = friendLinkRepository.findByUserIdFriendUserId(id, friendId);
 
-        if (user.getFriends().contains(friendId)) {
-
-            Set<Long> friendIds = user.getFriends();
-            friendIds.remove(friendId);
-            user.setFriends(friendIds);
-            userStorage.update(user);
-
-            friendIds = userFriend.getFriends();
-            friendIds.remove(id);
-            userFriend.setFriends(friendIds);
-            userStorage.update(userFriend);
-
+        if (friendLink.isPresent()) {
+            friendLinkRepository.delete(friendLink.get().getId());
         }
     }
+
 
     public Collection<User> findFriendById(Long id) {
         log.info("findFriendById id = {}", id);
 
-        User user = userStorage.findById(id);
+        userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
 
-        if (user == null) {
-            log.warn("id not exists");
-            throw new NotFoundException("id = " + id + " не найден");
-        }
+        return userRepository.findAllFriendsByUserId(id);
 
-        return user.getFriends().stream()
-                .map(userStorage::findById)
-                .toList();
     }
 
     public Collection<User> findCommonFriends(Long id, Long otherId) {
         log.info("removeFriend id = {}, otherId = {}", id,  otherId);
 
-        User user = userStorage.findById(id);
-        User userOther = userStorage.findById(otherId);
+        userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
 
-        if (user == null) {
-            log.warn("id not exists");
-            throw new NotFoundException("id = " + id + " не найден");
-        }
+        userRepository.findById(otherId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + otherId));
 
-        if (userOther == null) {
-            log.warn("otherId not exists");
-            throw new NotFoundException("otherId = " + otherId + " не найден");
-        }
-
-        return user.getFriends().stream()
-                .filter(userOther.getFriends()::contains)
-                .map(userStorage::findById)
-                .toList();
+        return userRepository.findAllCommonFriends(id, otherId);
     }
 
-    public User create(User user) {
-        log.info("create {}", user);
+    public User create(NewUserRequest request) {
+        log.info("create {}", request);
+
+        User user = UserMapper.toUser(request);
 
         List<String> validation = UserValidator.check(user);
 
@@ -138,42 +105,38 @@ public class UserService {
             throw new ValidationException("Проверка входных параметров", validation);
         }
 
-        if (UserValidator.checkEmailDublicate(userStorage.findAll(), user)) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             log.warn("dublicate email {}", user.getEmail());
             throw new ValidationException("Этот имейл уже используется");
         }
 
-        userStorage.create(user);
+        user = userRepository.save(user);
+
         return user;
     }
 
-    public User update(User newUser) {
-        log.info("update {}", newUser);
+    public User update(UpdateUserRequest request) {
+        log.info("update {}", request);
 
-        if (newUser.getId() == null) {
-            log.warn("id is null");
-            throw new ValidationException("Id должен быть указан");
+
+        User user = userRepository.findById(request.getId())
+                .map(u -> UserMapper.toUser(u, request))
+                .orElseThrow(() -> new NotFoundException("id = " + request.getId() + " не найден"));
+
+        List<String> validation = UserValidator.check(user);
+
+        if (!validation.isEmpty()) {
+            log.warn("validation {}", validation);
+            throw new ValidationException("Проверка входных параметров", validation);
         }
 
-        if (userStorage.findById(newUser.getId()) != null) {
-
-            List<String> validation = UserValidator.check(newUser);
-
-            if (!validation.isEmpty()) {
-                log.warn("validation {}", validation);
-                throw new ValidationException("Проверка входных параметров", validation);
-            }
-
-            if (UserValidator.checkEmailDublicate(userStorage.findAll(), newUser)) {
-                log.warn("dublicate email {}", newUser.getEmail());
-                throw new ValidationException("Этот имейл уже используется");
-            }
-
-            return userStorage.update(newUser);
+        if (userRepository.findAllByEmail(user.getEmail()).size() > 1) {
+            log.warn("dublicate email {}", user.getEmail());
+            throw new ValidationException("Этот имейл уже используется");
         }
 
-        log.warn("id not exists");
-        throw new NotFoundException("id = " + newUser.getId() + " не найден");
+        return userRepository.update(user);
+
     }
 
 

@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.time.LocalDate.now;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -64,28 +61,6 @@ public class UserValidatorTests {
         user.setBirthday(now().plusDays(1));
 
         assertTrue(UserValidator.check(user).contains("Дата рождения не может быть в будущем"));
-    }
-
-    @Test
-    void checkEmailDublicate() {
-        User user1 = new User();
-        user1.setId(1L);
-        user1.setEmail("email@email.com");
-        user1.setLogin("login");
-        user1.setName("name");
-        user1.setBirthday(now());
-
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setEmail("email@email.com");
-        user2.setLogin("login");
-        user2.setName("name");
-        user2.setBirthday(now());
-
-        List<User> users = new ArrayList<>();
-        users.add(user1);
-
-        assertTrue(UserValidator.checkEmailDublicate(users, user2));
     }
 
 
